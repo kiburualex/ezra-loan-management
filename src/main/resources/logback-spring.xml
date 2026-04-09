@@ -1,0 +1,15 @@
+<configuration>
+    <springProperty name="PORT" source="server.port" />
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <Pattern>
+                %white(%d{ISO8601}) %highlight(%-5level) [%blue(%t)] [%magenta(${PORT})] %yellow( %C{1}:%L): %msg%n%throwable
+            </Pattern>
+        </encoder>
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+    </root>
+
+</configuration>

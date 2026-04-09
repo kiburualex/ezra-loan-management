@@ -1,0 +1,20 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: loan-management
+  threads:
+    virtual:
+      enabled: true
+
+# actuator
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,actuator
+
+jwt:
+  secret: fd4a21d975d867cf890f0f21ce6c90370771e2d1934076b26f7e6551086aecc34ee3722d62497e18827354ad3ec955cdb6481b40eb3fb642f0a4464ddead2770
+  expiration: 86400   # 24 hours in seconds
