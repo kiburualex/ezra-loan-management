@@ -35,7 +35,7 @@ public class Customer {
     @Column(name = "phone", unique = true, nullable = false)
     private String phone;
 
-    @Column(name = "address")
+    @Column(name = "address", columnDefinition = "TEXT")
     private String address;
 
     @Column(name = "date_of_birth", nullable = false)
