@@ -1,0 +1,38 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: lending-postgres-db
+    environment:
+      POSTGRES_DB: lendingdb
+      POSTGRES_USER: lendinguser
+      POSTGRES_PASSWORD: lendingpass
+    ports:
+      - "5434:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d lendingdb -U lendinguser"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 30s               # Give Postgres more time to initialize
+    restart: unless-stopped
+
+  app:
+    build: .
+    container_name: lending-app
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/lendingdb
+      SPRING_DATASOURCE_USERNAME: lendinguser
+      SPRING_DATASOURCE_PASSWORD: lendingpass
+      SPRING_FLYWAY_ENABLED: "true"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./logs:/app/logs
+
+volumes:
+  postgres_data:

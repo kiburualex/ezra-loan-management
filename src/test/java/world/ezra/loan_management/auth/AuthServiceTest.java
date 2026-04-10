@@ -17,6 +17,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.test.context.ActiveProfiles;
 import world.ezra.loan_management.auth.dto.AuthRequest;
 import world.ezra.loan_management.auth.dto.AuthResponse;
 import world.ezra.loan_management.auth.service.JwtService;
@@ -33,6 +34,7 @@ import static org.mockito.Mockito.*;
 /**
  * @author Alex Kiburu
  */
+@ActiveProfiles("test")
 @ExtendWith(MockitoExtension.class)
 @DisplayName("Auth Service Tests")
 class AuthServiceTest {

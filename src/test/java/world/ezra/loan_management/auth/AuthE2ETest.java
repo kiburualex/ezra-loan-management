@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.hamcrest.Matchers.*;
@@ -15,6 +16,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
+@ActiveProfiles("test")
 @SpringBootTest
 @AutoConfigureMockMvc
 class AuthE2ETest {
@@ -26,6 +28,7 @@ class AuthE2ETest {
     private static final String USERNAME = "ezra";
     private static final String PASSWORD = "ezra";
 
+    // todo:: separate into success and failure nested classes
     @Test
     @DisplayName("Given valid credentials When login Then return JWT with expiration details")
     void shouldLoginSuccessfullyAndReturnJwt() throws Exception {
