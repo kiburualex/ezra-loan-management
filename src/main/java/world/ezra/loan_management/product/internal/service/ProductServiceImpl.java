@@ -56,15 +56,15 @@ public class ProductServiceImpl implements ProductApi {
         try {
             log.info("Creating new product with name: {}, {}", request.name(), request);
 
-            // check for duplicate name
+            // Check for duplicate name
             if (productRepository.findFirstByName(request.name()).isPresent()) {
                 throw new NoSuchElementException("Product with name '" + request.name() + "' already exists");
             }
 
-            // map request to entity
+            // Map request to entity
             Product product = productMapper.toEntity(request);
 
-            // save to database
+            // Save to database
             Product savedProduct = productRepository.save(product);
             ProductResponse productResponse = productMapper.toResponse(savedProduct);
             GenericResponse response = GenericResponse.builder()
@@ -116,5 +116,10 @@ public class ProductServiceImpl implements ProductApi {
             log.error("Error updating product: {}", e.getMessage());
             throw new OperationNotPermittedException("Error updating product: " + e.getMessage());
         }
+    }
+
+    @Override
+    public Optional<Product> findById(Long id) {
+        return productRepository.findById(id);
     }
 }

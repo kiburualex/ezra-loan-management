@@ -15,10 +15,12 @@ import world.ezra.loan_management.common.dto.PaginatedResponse;
 import world.ezra.loan_management.customer.api.CustomerApi;
 import world.ezra.loan_management.customer.internal.dto.CustomerRequest;
 import world.ezra.loan_management.customer.internal.model.Customer;
+import world.ezra.loan_management.customer.internal.model.CustomerFinancialMetrics;
+import world.ezra.loan_management.customer.internal.repository.CustomerFinancialMetricsRepository;
 import world.ezra.loan_management.customer.internal.repository.CustomerRepository;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
+import java.math.BigDecimal;
+import java.util.Optional;
 
 /**
  * @author Alex Kiburu
@@ -29,6 +31,7 @@ import java.time.format.DateTimeFormatter;
 public class CustomerServiceImpl implements CustomerApi {
 
     private final CustomerRepository customerRepository;
+    private final CustomerFinancialMetricsRepository customerFinancialMetricsRepository;
 
     @Override
     public ResponseEntity<?> findAll(String searchTerm, int page, int size, String sortBy, String sortDirection) {
@@ -51,7 +54,7 @@ public class CustomerServiceImpl implements CustomerApi {
     @Override
     public ResponseEntity<?> create(CustomerRequest request) {
         try {
-            // Build and save
+            // Create customer
             Customer customer = Customer.builder()
                     .firstName(request.firstName())
                     .lastName(request.lastName())
@@ -62,15 +65,35 @@ public class CustomerServiceImpl implements CustomerApi {
                     .dateOfBirth(request.dateOfBirth())
                     .preferredChannel(request.preferredChannel())
                     .build();
-            Customer createdCustomer = customerRepository.save(customer);
+            Customer savedCustomer = customerRepository.save(customer);
+
+            // Initialize financial metrics for the new customer
+            CustomerFinancialMetrics metrics = CustomerFinancialMetrics.builder()
+                    .customerId(savedCustomer.getId())
+                    .totalLoansTaken(0)
+                    .totalAmountBorrowed(BigDecimal.ZERO)
+                    .totalAmountRepaid(BigDecimal.ZERO)
+                    .onTimeRepaymentRate(new BigDecimal("1.0000"))
+                    .numberOfDefaults(0)
+                    .totalDaysLate(0)
+                    .averageDaysLate(BigDecimal.ZERO)
+                    .build();
+
+            customerFinancialMetricsRepository.save(metrics);
+
             GenericResponse response = GenericResponse.builder()
                     .status("00")
                     .message("Customer created successfully")
-                    .data(createdCustomer)
+                    .data(savedCustomer)
                     .build();
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public Optional<Customer> findById(Long id) {
+        return customerRepository.findById(id);
     }
 }

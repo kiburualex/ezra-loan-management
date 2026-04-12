@@ -3,10 +3,12 @@ package world.ezra.loan_management.customer.internal.model;
 import jakarta.persistence.*;
 import lombok.*;
 import world.ezra.loan_management.common.enums.PreferredChannel;
+import world.ezra.loan_management.scoring.internal.model.CreditScoringHistory;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * @author Alex Kiburu
@@ -56,6 +58,13 @@ public class Customer {
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    @OneToOne(mappedBy = "customer")
+    private CustomerFinancialMetrics financialMetrics;
+
+    // One-to-many relationship with credit scoring history
+    @OneToMany(mappedBy = "customerId", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<CreditScoringHistory> creditHistory;
 
     @PrePersist
     protected void onCreate() {
