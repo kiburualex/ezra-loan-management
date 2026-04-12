@@ -8,9 +8,11 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
+import org.springframework.pulsar.core.PulsarTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import world.ezra.loan_management.common.dto.GenericResponse;
+import world.ezra.loan_management.common.dto.LoanCreationRequestEvent;
 import world.ezra.loan_management.common.dto.PaginatedResponse;
 import world.ezra.loan_management.common.enums.BillingType;
 import world.ezra.loan_management.common.enums.LoanStatus;
@@ -47,6 +49,7 @@ public class LoanServiceImpl implements LoanApi {
     private final ProductApi productApi;
     private final CreditScoringApi creditScoringApi;
     private final FeeApplicationService feeApplicationService;
+    private final PulsarTemplate<@NonNull LoanCreationRequestEvent> pulsarTemplate;
 
     @Override
     public ResponseEntity<?> findAll(String searchTerm, int page, int size, String sortBy, String sortDirection) {
@@ -158,6 +161,18 @@ public class LoanServiceImpl implements LoanApi {
                 "loan", savedLoan,
                 "serviceFee", appliedServiceFee
         );
+
+        // send loan creation notification
+        LoanCreationRequestEvent event = new LoanCreationRequestEvent(
+                savedLoan.getId(),
+                savedLoan.getProduct().getId(),
+                customer.getId(),
+                customer.getFirstName(),
+                customer.getPhone(),
+                savedLoan.getPrincipalAmount(),
+                savedLoan.getTotalRepayableAmount()
+                );
+        pulsarTemplate.send("loan-creation-topic", event);
 
         GenericResponse genericResponse = GenericResponse.builder()
                 .status("00")

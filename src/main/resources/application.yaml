@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: 9090
 
 spring:
   application:
@@ -30,8 +30,13 @@ spring:
     clean-disabled: false           # Safety: prevent accidental clean
     table: flyway_schema_history   # Default is fine
     schemas: public
-  main: # todo:: can remove if not needed.(circular references should not be allowed)
+  main:
     allow-circular-references: true
+  pulsar:
+    client:
+      service-url: ${PULSAR_CLIENT_URL:pulsar://localhost:6650}
+    admin:
+      service-url: ${PULSAR_ADMIN_URL:http://localhost:8080}
 
 # actuator
 management:

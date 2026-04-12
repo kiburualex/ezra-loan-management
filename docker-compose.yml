@@ -18,16 +18,32 @@ services:
       start_period: 30s               # Give Postgres more time to initialize
     restart: unless-stopped
 
+  pulsar:
+    image: apachepulsar/pulsar:latest
+    container_name: lending-pulsar
+    command: bin/pulsar standalone
+    ports:
+      - "6650:6650"  # Broker port
+      - "8080:8080"  # Admin/HTTP port (changed to 8081 to avoid conflict with the app)
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/admin/v2/clusters"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
   app:
     build: .
     container_name: lending-app
     ports:
-      - "8080:8080"
+      - "9090:9090"
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/lendingdb
       SPRING_DATASOURCE_USERNAME: lendinguser
       SPRING_DATASOURCE_PASSWORD: lendingpass
       SPRING_FLYWAY_ENABLED: "true"
+      SPRING_PULSAR_CLIENT_SERVICE_URL: pulsar://pulsar:6650
+      SPRING_PULSAR_ADMIN_SERVICE_URL: http://pulsar:8080
     depends_on:
       postgres:
         condition: service_healthy

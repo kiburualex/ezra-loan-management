@@ -67,3 +67,31 @@ INSERT INTO loans (customer_id, product_id, principal_amount, disbursed_amount, 
                    origination_date, is_installment_based, number_of_installments, billing_type, status)
 VALUES (3, 3, 10000.00, 10000.00, 11200.00,
         CURRENT_DATE - INTERVAL '90 days', false, NULL, 'INDIVIDUAL', 'CLOSED');
+
+
+-- =====================================================
+-- 4. NOTIFICATIONS
+-- =====================================================
+-- Notification Templates Seed Data
+INSERT INTO notification_templates (event_type, channel, subject, body) VALUES
+-- Loan Creation
+('LOAN_CREATED', 'SMS', NULL, 'Dear {customer_name}, your loan of {principal_amount} has been approved and disbursed. Total repayable: {total_repayable}. Thank you for choosing us!'),
+('LOAN_CREATED', 'EMAIL', 'Loan Approved - {loan_id}', 'Dear {customer_name},<br/><br/>Congratulations! Your loan application has been approved.<br/><br/>Loan Details:<br/>- Loan ID: {loan_id}<br/>- Principal Amount: {principal_amount}<br/>- Total Repayable: {total_repayable}<br/><br/>Thank you for banking with us.'),
+
+-- Payment Reminders
+('PAYMENT_REMINDER_3_DAYS', 'SMS', NULL, 'Reminder: Your loan payment of is due in 3 days. Please ensure sufficient funds.'),
+('PAYMENT_REMINDER_1_DAY', 'SMS', NULL, 'FINAL REMINDER: Your loan payment is due TOMORROW. Please make your payment to avoid late fees.'),
+
+-- Overdue Notifications
+('LOAN_OVERDUE_FIRST', 'SMS', NULL, 'Your loan payment is now overdue. Please make a payment to avoid additional fees.'),
+('OVERDUE_3_DAYS', 'SMS', NULL, 'URGENT: Your loan is 3 days overdue. Late fees have been applied. Please pay immediately.'),
+('OVERDUE_7_DAYS', 'SMS', NULL, 'FINAL WARNING: Your loan is 7 days overdue. Your account may be sent to collections if not paid within 7 days.'),
+('OVERDUE_14_DAYS', 'EMAIL', 'URGENT: Loan Overdue - Action Required', 'Dear {customer_name},<br/><br/>Your loan #{loan_id} is now 14 days overdue.<br/><br/>Please contact us immediately to arrange payment.<br/><br/>Regards,<br/>Credit Department'),
+('OVERDUE_30_DAYS', 'EMAIL', 'FINAL NOTICE: Loan Written Off', 'Dear {customer_name},<br/><br/>Your loan #{loan_id} has been written off due to non-payment.<br/><br/>Please contact our collections department immediately.'),
+
+-- Repayment Confirmation
+('REPAYMENT_RECEIVED', 'SMS', NULL, 'Payment of {amount} received for your loan. Thank you!'),
+('REPAYMENT_RECEIVED', 'EMAIL', 'Payment Confirmation - Loan {loan_id}', 'Dear {customer_name},<br/><br/>We have received your payment of {amount}.<br/><br/>Thank you for your prompt payment.'),
+
+-- Fee Applied
+('FEE_APPLIED', 'SMS', NULL, 'A fee of {amount} has been applied to your loan. Please check your account.');

@@ -152,7 +152,6 @@ CREATE TABLE notifications
     id               BIGSERIAL PRIMARY KEY,
     customer_id      BIGINT      NOT NULL REFERENCES customers (id) ON DELETE RESTRICT,
     loan_id          BIGINT REFERENCES loans (id) ON DELETE RESTRICT,
-    template_id      BIGINT      REFERENCES notification_templates (id) ON DELETE SET NULL,
     channel          VARCHAR(20) NOT NULL,
     rendered_message TEXT        NOT NULL,
     sent_at          TIMESTAMP,

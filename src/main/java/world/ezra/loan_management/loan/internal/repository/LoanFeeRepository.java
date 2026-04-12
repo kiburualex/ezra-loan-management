@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import world.ezra.loan_management.common.enums.LoanFeeType;
 import world.ezra.loan_management.loan.internal.model.Loan;
 import world.ezra.loan_management.loan.internal.model.LoanFee;
 
@@ -27,7 +28,7 @@ public interface LoanFeeRepository extends JpaRepository<@NonNull LoanFee, @NonN
     List<LoanFee> findByLoan(Loan loan);
 
     // Find fees by type for a loan
-    List<LoanFee> findByLoanIdAndFeeType(Long loanId, LoanFee.FeeType feeType);
+    List<LoanFee> findByLoanIdAndFeeType(Long loanId, LoanFeeType feeType);
 
     // Find fees applied within a date range
     List<LoanFee> findByAppliedDateBetween(LocalDateTime startDate, LocalDateTime endDate);
