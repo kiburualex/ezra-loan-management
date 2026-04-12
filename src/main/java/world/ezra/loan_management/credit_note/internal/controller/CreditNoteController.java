@@ -1,22 +1,23 @@
-package world.ezra.loan_management.loan.internal.controller;
+package world.ezra.loan_management.credit_note.internal.controller;
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import world.ezra.loan_management.loan.api.LoanApi;
-import world.ezra.loan_management.loan.internal.dto.LoanRequest;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import world.ezra.loan_management.credit_note.api.CreditNoteApi;
 
 /**
  * @author Alex Kiburu
  */
 @RestController
-@RequestMapping("/api/loans")
+@RequestMapping("/api/credit-notes")
 @RequiredArgsConstructor
 @SecurityRequirement(name = "Bearer Authentication")
-public class LoanController {
-    private final LoanApi loanApi;
+public class CreditNoteController {
+    private final CreditNoteApi creditNoteApi;
 
     @GetMapping
     public ResponseEntity<?> getAll(@RequestParam(required = false) String searchTerm,
@@ -24,11 +25,6 @@ public class LoanController {
                                     @RequestParam(defaultValue = "10") int size,
                                     @RequestParam(defaultValue = "id") String sortBy,
                                     @RequestParam(defaultValue = "desc") String sortDirection) {
-        return loanApi.findAll(searchTerm, page, size, sortBy, sortDirection);
-    }
-
-    @PostMapping("/new")
-    public ResponseEntity<?> newLoanApplication(@Valid @RequestBody LoanRequest request) {
-        return loanApi.newLoanApplication(request);
+        return creditNoteApi.findAll(searchTerm, page, size, sortBy, sortDirection);
     }
 }

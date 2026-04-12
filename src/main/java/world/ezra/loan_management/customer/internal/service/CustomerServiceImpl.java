@@ -20,6 +20,7 @@ import world.ezra.loan_management.customer.internal.repository.CustomerFinancial
 import world.ezra.loan_management.customer.internal.repository.CustomerRepository;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.Optional;
 
 /**
@@ -43,12 +44,12 @@ public class CustomerServiceImpl implements CustomerApi {
 
         // If search term is null or empty, return all customers
         if (StringUtils.isEmpty(searchTerm)) {
-            Page<@NonNull Customer> customerPage = customerRepository.findAll(pageable);
-            return ResponseEntity.ok(new PaginatedResponse<>(customerPage));
+            Page<@NonNull Customer> dataPage = customerRepository.findAll(pageable);
+            return ResponseEntity.ok(new PaginatedResponse<>(dataPage));
         }
 
-        Page<@NonNull Customer> customerPage = customerRepository.searchByAllFields(searchTerm.trim(), pageable);
-        return ResponseEntity.ok(new PaginatedResponse<>(customerPage));
+        Page<@NonNull Customer> dataPage = customerRepository.searchByAllFields(searchTerm.trim(), pageable);
+        return ResponseEntity.ok(new PaginatedResponse<>(dataPage));
     }
 
     @Override
@@ -95,5 +96,21 @@ public class CustomerServiceImpl implements CustomerApi {
     @Override
     public Optional<Customer> findById(Long id) {
         return customerRepository.findById(id);
+    }
+
+    /**
+     * Update customer financial metrics after repayment
+     */
+    @Override
+    public void updateCustomerMetrics(Long customerId, BigDecimal amountRepaid) {
+        CustomerFinancialMetrics metrics = customerFinancialMetricsRepository.findByCustomerId(customerId)
+                .orElse(null);
+
+        if (metrics != null) {
+            metrics.setTotalAmountRepaid(metrics.getTotalAmountRepaid().add(amountRepaid));
+            metrics.setLastRepaymentDate(LocalDate.now());
+            customerFinancialMetricsRepository.save(metrics);
+            log.info("Updated customer metrics for customer: {}", customerId);
+        }
     }
 }

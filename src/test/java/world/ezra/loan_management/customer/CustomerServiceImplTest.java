@@ -139,8 +139,8 @@ public class CustomerServiceImplTest {
         @DisplayName("Given no search term When findAll Then return all customers with pagination")
         void shouldReturnAllCustomersWhenNoSearchTerm() {
             // Given
-            Page<@NonNull Customer> customerPage = new PageImpl<>(Collections.singletonList(validCustomer));
-            when(customerRepository.findAll(any(Pageable.class))).thenReturn(customerPage);
+            Page<@NonNull Customer> dataPage = new PageImpl<>(Collections.singletonList(validCustomer));
+            when(customerRepository.findAll(any(Pageable.class))).thenReturn(dataPage);
 
             // When
             ResponseEntity<?> response = customerService.findAll(null, 0, 10, "id", "desc");
@@ -156,8 +156,8 @@ public class CustomerServiceImplTest {
         void shouldReturnFilteredResultsWhenSearchTermProvided() {
             // Given
             String searchTerm = "John";
-            Page<@NonNull Customer> customerPage = new PageImpl<>(Collections.singletonList(validCustomer));
-            when(customerRepository.searchByAllFields(eq(searchTerm), any(Pageable.class))).thenReturn(customerPage);
+            Page<@NonNull Customer> dataPage = new PageImpl<>(Collections.singletonList(validCustomer));
+            when(customerRepository.searchByAllFields(eq(searchTerm), any(Pageable.class))).thenReturn(dataPage);
 
             // When
             ResponseEntity<?> response = customerService.findAll(searchTerm, 0, 10, "id", "desc");
@@ -176,12 +176,12 @@ public class CustomerServiceImplTest {
         @DisplayName("When findAll Then return PaginatedResponse with correct metadata")
         void shouldReturnPaginatedResponseWithCorrectMetadata() {
             // Given
-            Page<@NonNull Customer> customerPage = new PageImpl<>(
+            Page<@NonNull Customer> dataPage = new PageImpl<>(
                     Collections.singletonList(validCustomer),
                     PageRequest.of(0, 10),
                     25L  // total elements
             );
-            when(customerRepository.findAll(any(Pageable.class))).thenReturn(customerPage);
+            when(customerRepository.findAll(any(Pageable.class))).thenReturn(dataPage);
 
             // When
             ResponseEntity<?> response = customerService.findAll(null, 0, 10, "id", "des");

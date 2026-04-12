@@ -43,12 +43,12 @@ public class ProductServiceImpl implements ProductApi {
 
         // If search term is null or empty, return all customers
         if (StringUtils.isEmpty(searchTerm)) {
-            Page<@NonNull Product> customerPage = productRepository.findAll(pageable);
-            return ResponseEntity.ok(new PaginatedResponse<>(customerPage));
+            Page<@NonNull Product> dataPage = productRepository.findAll(pageable);
+            return ResponseEntity.ok(new PaginatedResponse<>(dataPage));
         }
 
-        Page<@NonNull Product> customerPage = productRepository.searchByAllFields(searchTerm.trim(), pageable);
-        return ResponseEntity.ok(new PaginatedResponse<>(customerPage));
+        Page<@NonNull Product> dataPage = productRepository.searchByAllFields(searchTerm.trim(), pageable);
+        return ResponseEntity.ok(new PaginatedResponse<>(dataPage));
     }
 
     @Override

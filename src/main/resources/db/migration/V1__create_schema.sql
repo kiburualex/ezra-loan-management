@@ -161,6 +161,22 @@ CREATE TABLE notifications
     created_at       TIMESTAMP   DEFAULT CURRENT_TIMESTAMP
 );
 
+-- 11. CREDIT NOTES (for handling overpayments and adjustments)
+CREATE TABLE credit_notes
+(
+    id           BIGSERIAL PRIMARY KEY,
+    loan_id      BIGINT         NOT NULL REFERENCES loans (id) ON DELETE RESTRICT,
+    amount       DECIMAL(15, 2) NOT NULL CHECK (amount > 0),
+    reason       VARCHAR(50)    NOT NULL CHECK (reason IN ('OVERPAYMENT', 'ADJUSTMENT', 'FEE_REVERSAL')),
+    used         BOOLEAN        NOT NULL DEFAULT FALSE,
+    created_date TIMESTAMP      NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    used_date    TIMESTAMP,
+    used_against_loan_id BIGINT REFERENCES loans (id) ON DELETE SET NULL,
+    notes        TEXT,
+    created_at   TIMESTAMP      DEFAULT CURRENT_TIMESTAMP,
+    updated_at   TIMESTAMP      DEFAULT CURRENT_TIMESTAMP
+);
+
 -- =============================================
 -- INDEXES FOR PERFORMANCE (sweep jobs, scoring, reporting)
 -- =============================================

@@ -1,6 +1,5 @@
 package world.ezra.loan_management.loan.internal.service;
 
-import com.google.gson.Gson;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
@@ -33,6 +32,7 @@ import java.math.RoundingMode;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 /**
  * @author Alex Kiburu
@@ -47,7 +47,6 @@ public class LoanServiceImpl implements LoanApi {
     private final ProductApi productApi;
     private final CreditScoringApi creditScoringApi;
     private final FeeApplicationService feeApplicationService;
-    private final Gson gson = new Gson();
 
     @Override
     public ResponseEntity<?> findAll(String searchTerm, int page, int size, String sortBy, String sortDirection) {
@@ -57,8 +56,8 @@ public class LoanServiceImpl implements LoanApi {
 
         Pageable pageable = PageRequest.of(page, size, sort);
 
-        Page<@NonNull Loan> customerPage = loanRepository.findAll(pageable);
-        return ResponseEntity.ok(new PaginatedResponse<>(customerPage));
+        Page<@NonNull Loan> dataPage = loanRepository.findAll(pageable);
+        return ResponseEntity.ok(new PaginatedResponse<>(dataPage));
     }
 
     @Transactional
@@ -67,20 +66,20 @@ public class LoanServiceImpl implements LoanApi {
         log.info("Creating loan for customer: {}, product: {}",
                 request.customerId(), request.productId());
 
-        // 1. Check if customer exists
+        // Check if customer exists
         Customer customer = customerApi.findById(request.customerId())
                 .orElseThrow(() -> new NoSuchElementException("Customer not found with ID: " + request.customerId()));
 
-        // 2. Check if product exists
+        // Check if product exists
         Product product = productApi.findById(request.productId())
                 .orElseThrow(() -> new NoSuchElementException("Product not found with ID: " + request.productId()));
 
-        // 3. Check if product is active
+        // Check if product is active
         if (!product.getActive()) {
             throw new OperationNotPermittedException("Product '" + product.getName() + "' is not active for loans");
         }
 
-        // 4. Validate loan amount against product limits
+        // Validate loan amount against product limits
         if (request.principalAmount().compareTo(product.getMinLoanAmount()) < 0) {
             throw new OperationNotPermittedException(
                     String.format("Principal amount %.2f is below minimum loan amount of %.2f",
@@ -93,10 +92,10 @@ public class LoanServiceImpl implements LoanApi {
                             request.principalAmount(), product.getMaxLoanAmount()));
         }
 
-        // 5. Perform credit scoring
+        // Perform credit scoring
         var creditDecision = creditScoringApi.calculateScore(customer, product, request.principalAmount());
 
-        // 6. Check if loan should be approved based on score
+        // Check if loan should be approved based on score
         if ("REJECT".equals(creditDecision.decision())) {
             throw new OperationNotPermittedException(
                     String.format("Loan application rejected. Credit score: %d. Reason: %s",
@@ -109,18 +108,18 @@ public class LoanServiceImpl implements LoanApi {
                             creditDecision.score(), creditDecision.notes()));
         }
 
-        // 7. Calculate interest amount
+        // Calculate interest amount
         BigDecimal interestAmount = calculateInterest(request.principalAmount(), product);
 
-        // 8. Calculate service fee (without loan yet)
+        // Calculate service fee (without loan yet)
         BigDecimal serviceFee = feeApplicationService.calculateServiceFee(product, request.principalAmount());
 
-        // 9. Calculate total repayable amount (principal + interest + fees)
+        // Calculate total repayable amount (principal + interest + fees)
         BigDecimal totalRepayable = request.principalAmount()
                 .add(interestAmount)
                 .add(serviceFee);
 
-        // 10. Create loan entity
+        // Create loan entity
         Loan loan = Loan.builder()
                 .customer(customer)
                 .product(product)
@@ -140,16 +139,16 @@ public class LoanServiceImpl implements LoanApi {
 
         Loan savedLoan = loanRepository.save(loan);
 
-        // 11. Apply service fee to the saved loan (persist to database)
+        // Apply service fee to the saved loan (persist to database)
         BigDecimal appliedServiceFee = feeApplicationService.applyServiceFeeToLoan(savedLoan, product, request.principalAmount());
 
-        // 12. Update total repayable if fees were applied (should already match, but double-check)
+        // Update total repayable if fees were applied (should already match, but double-check)
         if (appliedServiceFee.compareTo(BigDecimal.ZERO) > 0) {
             // Fee already included in totalRepayable, but ensure it's consistent
             log.info("Service fee of {} applied to loan {}", appliedServiceFee, savedLoan.getId());
         }
 
-        // 13. Create installments for the loan
+        // Create installments for the loan
         List<LoanInstallment> installments = installmentService.createInstallments(savedLoan);
 
         log.info("Loan created successfully with ID: {}, Installments: {}, Credit Score: {}, Service Fee: {}",
@@ -217,5 +216,30 @@ public class LoanServiceImpl implements LoanApi {
                 (loan.getConsolidatedDueDay() < 1 || loan.getConsolidatedDueDay() > 31)) {
             throw new IllegalArgumentException("Consolidated due day must be between 1 and 31");
         }
+    }
+
+    @Override
+    public Optional<Loan> findById(Long id) {
+        return loanRepository.findById(id);
+    }
+
+    @Override
+    public Loan save(Loan loan) {
+        return loanRepository.save(loan);
+    }
+
+    @Override
+    public List<LoanInstallment> findPendingInstallmentsByLoanId(Long loanId) {
+        return installmentService.findPendingInstallmentsByLoanId(loanId);
+    }
+
+    @Override
+    public void updateInstallment(LoanInstallment installment) {
+        installmentService.updateInstallment(installment);
+    }
+
+    @Override
+    public boolean areAllInstallmentsPaid(Long loanId) {
+        return installmentService.areAllInstallmentsPaid(loanId);
     }
 }

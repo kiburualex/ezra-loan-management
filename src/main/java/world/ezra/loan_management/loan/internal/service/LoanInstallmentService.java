@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import world.ezra.loan_management.common.enums.BillingType;
 import world.ezra.loan_management.common.enums.InstallmentStatus;
-import world.ezra.loan_management.loan.internal.dto.LoanRequest;
 import world.ezra.loan_management.loan.internal.model.Loan;
 import world.ezra.loan_management.loan.internal.model.LoanInstallment;
 import world.ezra.loan_management.loan.internal.repository.LoanInstallmentRepository;
@@ -168,6 +167,27 @@ public class LoanInstallmentService {
      */
     public boolean hasOverdueInstallments(Loan loan) {
         return installmentRepository.hasOverdueInstallments(loan, LocalDate.now());
+    }
+
+
+    public List<LoanInstallment> findPendingInstallmentsByLoanId(Long loanId) {
+        return installmentRepository
+                .findByLoanIdOrderByInstallmentNumberAsc(loanId)
+                .stream()
+                .filter(i -> i.getStatus() == InstallmentStatus.PENDING)
+                .toList();
+    }
+
+
+    public void updateInstallment(LoanInstallment installment) {
+        installmentRepository.save(installment);
+    }
+
+    public boolean areAllInstallmentsPaid(Long loanId) {
+        return installmentRepository
+                .findByLoanIdOrderByInstallmentNumberAsc(loanId)
+                .stream()
+                .allMatch(i -> i.getStatus() == InstallmentStatus.PAID);
     }
 
 }
