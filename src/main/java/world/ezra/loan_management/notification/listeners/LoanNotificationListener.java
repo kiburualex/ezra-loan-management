@@ -39,6 +39,7 @@ public class LoanNotificationListener {
         NotificationTemplate notificationTemplate = notificationTemplateService.findNotificationTemplate(event, "LOAN_CREATED");
         var message = notificationTemplate.getBody()
                 .replace("{customer_name}", event.customerName())
+                .replace("{loan_id}", event.loanId().toString())
                 .replace("{principal_amount}", event.principalAmount().toString())
                 .replace("{total_repayable}", event.totalRepayable().toString());
         NotificationRequest newNotificationRequest = new NotificationRequest(

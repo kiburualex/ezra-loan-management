@@ -172,8 +172,8 @@ public class LoanServiceImpl implements LoanApi {
                 savedLoan.getId(),
                 savedLoan.getProduct().getId(),
                 customer.getId(),
-                customer.getFirstName(),
                 customer.getPhone(),
+                customer.getFirstName(),
                 savedLoan.getPrincipalAmount(),
                 savedLoan.getTotalRepayableAmount(),
                 preferredChannel
