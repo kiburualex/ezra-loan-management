@@ -1,6 +1,8 @@
 # Lending Application - Loan Management System
 
-A production-ready loan management system built with Spring Boot, featuring automated loan processing, credit scoring, fee management, and event-driven notifications.
+A production-ready loan management system built with Spring Boot, 
+designed using Domain-Driven Design (DDD) principles, featuring automated loan processing, 
+credit scoring, fee management, and event-driven notifications.
 
 ## Tech Stack
 
