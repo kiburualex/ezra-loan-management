@@ -142,7 +142,7 @@ Supported Channels: SMS, Email, Push. Event Types: Loan creation, payment remind
 Credit Note Types: OVERPAYMENT, ADJUSTMENT, FEE_REVERSAL
 
 ## Database Schema
-[Lending DB ER Diagram](src/main/resources/LendingDB_ERD.png)
+![Lending DB ER Diagram](src/main/resources/LendingDB_ERD.png)
 
 ## Core Tables
 
