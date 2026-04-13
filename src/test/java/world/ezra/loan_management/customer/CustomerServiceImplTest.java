@@ -19,6 +19,7 @@ import world.ezra.loan_management.common.dto.PaginatedResponse;
 import world.ezra.loan_management.common.enums.PreferredChannel;
 import world.ezra.loan_management.customer.internal.dto.CustomerRequest;
 import world.ezra.loan_management.customer.internal.model.Customer;
+import world.ezra.loan_management.customer.internal.repository.CustomerFinancialMetricsRepository;
 import world.ezra.loan_management.customer.internal.repository.CustomerRepository;
 import world.ezra.loan_management.customer.internal.service.CustomerServiceImpl;
 
@@ -41,6 +42,9 @@ public class CustomerServiceImplTest {
 
     @Mock
     private CustomerRepository customerRepository;
+
+    @Mock
+    private CustomerFinancialMetricsRepository customerFinancialMetricsRepository;
 
     @InjectMocks
     private CustomerServiceImpl customerService;

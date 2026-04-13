@@ -34,8 +34,11 @@ public class CreditNote {
     @Column(name = "reason")
     private CreditNoteReason reason;
 
-    @Column(name = "used", columnDefinition = "0")
-    private Boolean used;
+    @Column(name = "notes")
+    private String notes;
+
+    @Column(name = "used", nullable = false)
+    private Boolean used = false;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;

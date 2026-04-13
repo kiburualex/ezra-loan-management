@@ -2,7 +2,6 @@ package world.ezra.loan_management.loan.internal.repository;
 
 import org.jspecify.annotations.NonNull;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
 import world.ezra.loan_management.common.enums.LoanFeeType;
 import world.ezra.loan_management.loan.internal.model.Loan;
 import world.ezra.loan_management.loan.internal.model.LoanFee;
@@ -13,7 +12,6 @@ import java.util.Optional;
 /**
  * @author Alex Kiburu
  */
-@Repository
 public interface LoanFeeRepository extends JpaRepository<@NonNull LoanFee, @NonNull Long> {
 
     List<LoanFee> findByLoan(Loan loan);

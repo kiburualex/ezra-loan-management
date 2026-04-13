@@ -6,9 +6,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import world.ezra.loan_management.common.dto.GenericResponse;
+import world.ezra.loan_management.common.dto.LoanCreationRequestEvent;
+import world.ezra.loan_management.common.enums.PreferredChannel;
 import world.ezra.loan_management.notification.internal.dto.NotificationTemplateRequest;
 import world.ezra.loan_management.notification.internal.model.NotificationTemplate;
 import world.ezra.loan_management.notification.internal.repository.NotificationTemplateRepository;
+
+import java.util.Optional;
 
 /**
  * @author Alex Kiburu
@@ -28,7 +32,7 @@ public class NotificationTemplateService {
                 request.eventType(), request.channel().name());
 
         // Check if template already exists for this event type and channel
-        var existingTemplate = templateRepository.findByEventTypeAndChannel(
+        var existingTemplate = templateRepository.findFirstByEventTypeAndChannel(
                 request.eventType(), request.channel());
 
         if (existingTemplate.isPresent()) {
@@ -55,4 +59,25 @@ public class NotificationTemplateService {
                 .build();
         return ResponseEntity.ok().body(response);
     }
+
+
+    public NotificationTemplate findNotificationTemplate(LoanCreationRequestEvent event, String eventType) {
+        // Priority 1: Product-specific template
+        Optional<NotificationTemplate> productTemplate = templateRepository
+                .findFirstByProductIdAndEventType(event.productId(), eventType);
+        if (productTemplate.isPresent()) {
+            return productTemplate.get();
+        }
+
+        // Priority 2: Customer's preferred channel (default to SMS)
+        String preferredChannel = event.preferredChannel() != null ? event.preferredChannel() : "SMS";
+        Optional<NotificationTemplate> channelTemplate = templateRepository
+                .findFirstByEventTypeAndChannel(eventType, PreferredChannel.valueOf(preferredChannel));
+
+        // Priority 3: Default SMS template (fallback)
+        return channelTemplate.orElseGet(() -> templateRepository
+                .findFirstByEventTypeAndChannel(eventType, PreferredChannel.SMS)
+                .orElse(null));
+    }
+
 }

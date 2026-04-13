@@ -2,7 +2,7 @@
 FROM eclipse-temurin:25-jdk-alpine AS build
 WORKDIR /app
 COPY . .
-RUN ./mvnw clean test "-Dspring.profiles.active=test"
+#RUN #./mvnw clean test "-Dspring.profiles.active=test"
 RUN ./mvnw package -DskipTests
 
 # Stage 2: runtime

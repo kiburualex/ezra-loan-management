@@ -12,6 +12,7 @@ public record LoanCreationRequestEvent(
         String phoneNumber,         // Required if the type is 'SMS'
         String customerName,        // Maps to {customer_name}
         BigDecimal principalAmount, // Maps to {principal_amount}
-        BigDecimal totalRepayable   // Maps to {total_repayable}
+        BigDecimal totalRepayable,  // Maps to {total_repayable}
+        String preferredChannel     // SMS, EMAIL
 ) {
 }

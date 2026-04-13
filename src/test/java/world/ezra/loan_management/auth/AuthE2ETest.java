@@ -7,7 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
+import org.springframework.pulsar.core.PulsarTemplate;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.hamcrest.Matchers.*;
@@ -23,6 +25,8 @@ class AuthE2ETest {
 
     @Autowired
     private MockMvc mockMvc;
+    @MockitoBean
+    private PulsarTemplate<?> pulsarTemplate;
 
     private final ObjectMapper objectMapper = new ObjectMapper();   // Spring Boot auto-configures this
     private static final String USERNAME = "ezra";

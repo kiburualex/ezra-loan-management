@@ -5,7 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import world.ezra.loan_management.customer.internal.model.CustomerFinancialMetrics;
 
@@ -15,7 +14,6 @@ import java.util.Optional;
 /**
  * @author Alex Kiburu
  */
-@Repository
 public interface CustomerFinancialMetricsRepository extends JpaRepository<@NonNull CustomerFinancialMetrics, @NonNull Long> {
 
     Optional<CustomerFinancialMetrics> findByCustomerId(Long customerId);

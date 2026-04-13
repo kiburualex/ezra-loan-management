@@ -162,6 +162,11 @@ public class LoanServiceImpl implements LoanApi {
                 "serviceFee", appliedServiceFee
         );
 
+        var preferredChannel = "SMS";
+        if(customer.getPreferredChannel() != null) {
+            preferredChannel = customer.getPreferredChannel().name();
+        }
+
         // send loan creation notification
         LoanCreationRequestEvent event = new LoanCreationRequestEvent(
                 savedLoan.getId(),
@@ -170,7 +175,8 @@ public class LoanServiceImpl implements LoanApi {
                 customer.getFirstName(),
                 customer.getPhone(),
                 savedLoan.getPrincipalAmount(),
-                savedLoan.getTotalRepayableAmount()
+                savedLoan.getTotalRepayableAmount(),
+                preferredChannel
                 );
         pulsarTemplate.send("loan-creation-topic", event);
 

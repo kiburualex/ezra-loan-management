@@ -6,9 +6,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
+import org.springframework.pulsar.core.PulsarTemplate;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import world.ezra.loan_management.auth.service.JwtService;
+import world.ezra.loan_management.customer.api.CustomerApi;
+import world.ezra.loan_management.product.api.ProductApi;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -23,6 +28,14 @@ public class BaseTest {
 
     @Autowired
     protected MockMvc mockMvc;
+    @MockitoBean
+    private JwtService jwtService;
+    @MockitoBean
+    private CustomerApi customerApi;
+    @MockitoBean
+    private ProductApi productApi;
+    @MockitoBean
+    private PulsarTemplate<?> pulsarTemplate;
     protected final ObjectMapper objectMapper = new ObjectMapper();
     protected static final String USERNAME = "ezra";
     protected static final String PASSWORD = "ezra";
