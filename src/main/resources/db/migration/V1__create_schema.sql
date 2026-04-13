@@ -176,6 +176,75 @@ CREATE TABLE credit_notes
     updated_at   TIMESTAMP      DEFAULT CURRENT_TIMESTAMP
 );
 
--- =============================================
--- INDEXES FOR PERFORMANCE (sweep jobs, scoring, reporting)
--- =============================================
+
+-- =====================================================
+-- INDEXES FOR PERFORMANCE
+-- =====================================================
+
+-- Customers indexes
+CREATE INDEX idx_customers_email ON customers(email);
+CREATE INDEX idx_customers_phone ON customers(phone);
+CREATE INDEX idx_customers_national_id ON customers(national_id);
+CREATE INDEX idx_customers_created_at ON customers(created_at);
+
+-- Products indexes
+CREATE INDEX idx_products_active ON products(active);
+CREATE INDEX idx_products_tenure_type ON products(tenure_type);
+CREATE INDEX idx_products_min_max_loan ON products(min_loan_amount, max_loan_amount);
+
+-- Loans indexes
+CREATE INDEX idx_loans_customer_id ON loans(customer_id);
+CREATE INDEX idx_loans_product_id ON loans(product_id);
+CREATE INDEX idx_loans_status ON loans(status);
+CREATE INDEX idx_loans_origination_date ON loans(origination_date);
+CREATE INDEX idx_loans_customer_status ON loans(customer_id, status);
+CREATE INDEX idx_loans_created_at ON loans(created_at);
+
+-- Loan Installments indexes
+CREATE INDEX idx_loan_installments_loan_id ON loan_installments(loan_id);
+CREATE INDEX idx_loan_installments_due_date ON loan_installments(due_date);
+CREATE INDEX idx_loan_installments_status ON loan_installments(status);
+CREATE INDEX idx_loan_installments_loan_status ON loan_installments(loan_id, status);
+CREATE INDEX idx_loan_installments_due_date_status ON loan_installments(due_date, status);
+
+-- Repayments indexes
+CREATE INDEX idx_repayments_loan_id ON repayments(loan_id);
+CREATE INDEX idx_repayments_installment_id ON repayments(installment_id);
+CREATE INDEX idx_repayments_payment_date ON repayments(payment_date);
+CREATE INDEX idx_repayments_loan_date ON repayments(loan_id, payment_date);
+
+-- Loan Fees indexes
+CREATE INDEX idx_loan_fees_loan_id ON loan_fees(loan_id);
+CREATE INDEX idx_loan_fees_fee_type ON loan_fees(fee_type);
+CREATE INDEX idx_loan_fees_applied_date ON loan_fees(applied_date);
+CREATE INDEX idx_loan_fees_loan_type ON loan_fees(loan_id, fee_type);
+
+-- Customer Financial Metrics indexes
+CREATE INDEX idx_customer_financial_metrics_updated ON customer_financial_metrics(updated_at);
+CREATE INDEX idx_customer_financial_metrics_repayment_rate ON customer_financial_metrics(on_time_repayment_rate);
+
+-- Credit Scoring History indexes
+CREATE INDEX idx_credit_scoring_customer_id ON credit_scoring_history(customer_id);
+CREATE INDEX idx_credit_scoring_calculated_at ON credit_scoring_history(calculated_at);
+CREATE INDEX idx_credit_scoring_decision ON credit_scoring_history(decision);
+CREATE INDEX idx_credit_scoring_customer_date ON credit_scoring_history(customer_id, calculated_at);
+
+-- Notification Templates indexes
+CREATE INDEX idx_notification_templates_event_type ON notification_templates(event_type);
+CREATE INDEX idx_notification_templates_product_id ON notification_templates(product_id);
+CREATE INDEX idx_notification_templates_channel ON notification_templates(channel);
+
+-- Notifications indexes
+CREATE INDEX idx_notifications_customer_id ON notifications(customer_id);
+CREATE INDEX idx_notifications_loan_id ON notifications(loan_id);
+CREATE INDEX idx_notifications_status ON notifications(status);
+CREATE INDEX idx_notifications_sent_at ON notifications(sent_at);
+CREATE INDEX idx_notifications_customer_status ON notifications(customer_id, status);
+CREATE INDEX idx_notifications_created_at ON notifications(created_at);
+
+-- Credit Notes indexes
+CREATE INDEX idx_credit_notes_loan_id ON credit_notes(loan_id);
+CREATE INDEX idx_credit_notes_used ON credit_notes(used);
+CREATE INDEX idx_credit_notes_created_date ON credit_notes(created_date);
+CREATE INDEX idx_credit_notes_used_against ON credit_notes(used_against_loan_id);
+CREATE INDEX idx_credit_notes_loan_used ON credit_notes(loan_id, used);
