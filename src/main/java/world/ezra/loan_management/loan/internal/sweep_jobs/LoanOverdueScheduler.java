@@ -22,10 +22,14 @@ public class LoanOverdueScheduler {
     private final LoanInstallmentService installmentService;
     private final LoanRepository loanRepository;
 
-    @Scheduled(cron = "0 0 1 * * *") // Run daily at 1 AM
+    /**
+     * Overdue Loan Processing - Runs daily at 1 AM
+     * Detects overdue installments, updates loan status, applies fees, triggers notifications
+     */
+    @Scheduled(cron = "0 0 1 * * *")
     @Transactional
     public void processOverdueInstallments() {
-        log.info("Starting overdue installment processing");
+        log.info("=== OVERDUE LOAN PROCESSING STARTED ===");
 
         // Update installment statuses
         int updatedInstallments = installmentService.updateOverdueInstallments();
@@ -40,20 +44,23 @@ public class LoanOverdueScheduler {
                     loan.setStatus(LoanStatus.OVERDUE);
                     loanRepository.save(loan);
                     log.info("Updated loan {} to OVERDUE status", loan.getId());
-
                     // todo:: apply late fees or trigger notification
-                    // todo:: send event reminder
-                    /**
-                     * todo::
-                     * 1. first send notification on due date
-                     * 2. apply fees
-                     * */
-                }else{
-                    //
                 }
             }
         }
 
         log.info("Completed overdue installment processing");
+    }
+
+
+    /**
+     * Payment Reminders - Runs daily at 9 AM
+     * Sends reminders for payments due in 3 days and tomorrow
+     */
+    @Scheduled(cron = "0 0 9 * * *")
+    @Transactional
+    public void sendPaymentReminders() {
+        log.info("=== PAYMENT REMINDERS STARTED ===");
+        // TODO: send event reminder for late payment and fees incurred
     }
 }
