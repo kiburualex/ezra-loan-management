@@ -20,6 +20,4 @@ import java.util.List;
 public interface LoanRepository extends JpaRepository<@NonNull Loan, @NonNull Long> {
     // find loans that are overdue by expected payment date
     // find loans that have status as overdue for processing
-
-
 }
